@@ -15,5 +15,5 @@
   },
   "peerDependencies": {
     "@react-native-community/netinfo": "^5.7.0"
-  },
+  }
 }
