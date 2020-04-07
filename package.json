@@ -11,7 +11,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@react-native-community/netinfo": "^5.7.0",
     "underscore": "*"
-  }
+  },
+  "peerDependencies": {
+    "@react-native-community/netinfo": "^5.7.0"
+  },
 }
