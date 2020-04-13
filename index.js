@@ -7,21 +7,21 @@ module.exports = {  // cached singleton instance
   lastChangeAt: null,
   init(options) {
     this.mOpts = options;
-    NetInfo.isConnected.addEventListener('connectionChange', _.throttle(this.handleConnectivityChange.bind(this), 1000));
+    NetInfo.addEventListener(_.throttle(this.handleConnectivityChange.bind(this), 1000));
     this.tryConnection();
   },
 
   tryConnection() {
-    return NetInfo.isConnected.fetch()
+    return NetInfo.fetch()
       .then(this.handleConnectivityChange.bind(this))
   },
 
   // Connectivity handling
   // This will get called whenever our connectivity status changes
-  handleConnectivityChange(isConnected) {
+  handleConnectivityChange(state) {
     const timestampOfChange = new Date(); // keep a timestamp of the change
     this.lastChangeAt = timestampOfChange; // add it to a global var
-    if (!isConnected  // if rn says we're not connected
+    if (!state.isConnected  // if rn says we're not connected
       || // OR
       (
         this.mOpts // if we want to double check online statuses too
@@ -31,7 +31,7 @@ module.exports = {  // cached singleton instance
         // now that we've verified wether we're up or not
         if (this.shouldDispatchEvent(timestampOfChange)) {
           // also check if the value was null (in case of errors)
-          const newValue = (areUp == null) ? isConnected : areUp;
+          const newValue = (areUp == null) ? state.isConnected : areUp;
 
           // and dispatch the event
           this.dispatchConnectivityChanged(newValue, timestampOfChange);
@@ -40,9 +40,9 @@ module.exports = {  // cached singleton instance
       });
     } else if (this.shouldDispatchEvent(timestampOfChange)) {
       // make sure we ONLY dispatch if there hasn't been any more recent con change event
-      this.dispatchConnectivityChanged(isConnected, timestampOfChange);
+      this.dispatchConnectivityChanged(state.isConnected, timestampOfChange);
     }
-    return isConnected;
+    return state.isConnected;
   },
 
   shouldDispatchEvent(timestampOfChange) {
@@ -88,7 +88,7 @@ module.exports = {  // cached singleton instance
     // finally dispatch a callback if we have one
     if (this.mOpts.onConnectivityChange) {
       if (this.mOpts.attachConnectionInfo) {
-        NetInfo.getConnectionInfo().then((conInfo) => {
+        NetInfo.fetch().then((conInfo) => {
           this.mOpts.onConnectivityChange(isConnected, timestamp, conInfo);
         });
       } else {
