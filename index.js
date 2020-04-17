@@ -5,7 +5,7 @@ import _ from 'underscore';
 module.exports = {  // cached singleton instance
   mOpts: null,
   lastChangeAt: null,
-  lastIsConnected: true,
+  lastIsConnected: null,
   init(options) {
     this.mOpts = options;
     NetInfo.addEventListener(_.throttle(this.handleConnectivityChange.bind(this), 1000));
