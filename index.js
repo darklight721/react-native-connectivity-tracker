@@ -5,6 +5,7 @@ import _ from 'underscore';
 module.exports = {  // cached singleton instance
   mOpts: null,
   lastChangeAt: null,
+  lastIsConnected: true,
   init(options) {
     this.mOpts = options;
     NetInfo.addEventListener(_.throttle(this.handleConnectivityChange.bind(this), 1000));
@@ -85,6 +86,9 @@ module.exports = {  // cached singleton instance
   },
 
   dispatchConnectivityChanged(isConnected, timestamp) {
+    if (isConnected === this.lastIsConnected) return
+    this.lastIsConnected = isConnected
+
     // finally dispatch a callback if we have one
     if (this.mOpts.onConnectivityChange) {
       if (this.mOpts.attachConnectionInfo) {
