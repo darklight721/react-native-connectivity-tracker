@@ -8,8 +8,15 @@ module.exports = {  // cached singleton instance
   lastIsConnected: null,
   init(options) {
     this.mOpts = options;
-    NetInfo.addEventListener(_.throttle(this.handleConnectivityChange.bind(this), 1000));
+    const unsubscribe = NetInfo.addEventListener(_.throttle(this.handleConnectivityChange.bind(this), 1000));
     this.tryConnection();
+
+    return () => {
+      this.mOpts = null
+      this.lastChangeAt = null
+      this.lastIsConnected = null
+      unsubscribe()
+    }
   },
 
   tryConnection() {
